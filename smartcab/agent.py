@@ -135,7 +135,9 @@ class LearningAgent(Agent):
         #   Otherwise, choose an action with the highest Q-value for the current state
 
         if (self.learning) and (random.random() >= self.epsilon):
-            action = max(self.Q[state], key=self.Q[state].get)
+            highest_value = max(self.Q[state].values())
+            best_actions = [k for k, v in self.Q[state].items() if v == highest_value]
+            action = random.choice(best_actions)
         else:
             action = np.random.choice(self.valid_actions)
 
@@ -156,7 +158,7 @@ class LearningAgent(Agent):
 
         if self.learning:
             old_reward = self.Q[state][action]
-            self.Q[state][action] = old_reward + self.alpha * reward
+            self.Q[state][action] = old_reward + self.alpha * (reward - self.Q[state][action])
 
         return self
 
@@ -215,7 +217,7 @@ def run():
     # Flags:
     #   tolerance  - epsilon tolerance before beginning testing, default is 0.05
     #   n_test     - discrete number of testing trials to perform, default is 0
-    sim.run(n_test=10, tolerance=.01)
+    sim.run(n_test=10, tolerance=.05)
 
 
 if __name__ == '__main__':
